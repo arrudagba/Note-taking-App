@@ -121,3 +121,4 @@ int main(void) {
     return 0;
 }
 
+//gcc -o main  main.c filehandling.c -lleif -lglfw -lm -lGL -lclipboard -lxcb

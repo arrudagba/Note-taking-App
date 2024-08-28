@@ -1,6 +1,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
+
+
+int is_text_file(unsigned char *buffer, long size) {
+    for (long i = 0; i < size; i++) {
+        if (!isprint(buffer[i]) && !isspace(buffer[i]) && buffer[i] != '\0') {
+            return 0;  
+        }
+    }
+    return 1;  
+}
+
 
 void createfile() {
     FILE *fp;
@@ -41,7 +53,7 @@ void openfile() {
     long file_size;
     unsigned char *buffer;
 
-    snprintf(command, sizeof(command), "zenity --file-selection --title=\"Selecionar um arquivo\"");
+    snprintf(command, sizeof(command), "zenity --file-selection --title=\"Selecionar um arquivo\" --file-filter=\"Text files (txt) | *.txt\" --file-filter=\"All files | *.*\"");
     fp_zenity = popen(command, "r");
     if (fp_zenity == NULL) {
         perror("popen");
@@ -77,10 +89,15 @@ void openfile() {
     fread(buffer, 1, file_size, fp);
     fclose(fp);
     
-    buffer[file_size] = '\0';
+    if (!is_text_file(buffer, file_size)) {
+        printf("O arquivo selecionado não parece ser um arquivo de texto.\n");
+        free(buffer);
+        return;
+    }
 
-    printf("Conteúdo do arquivo (%ld bytes):\n%s\n", file_size, buffer);
+    buffer[file_size] = '\0';  
+    
+    //buffer contém todo conteúdo do arquivo
 
     free(buffer);
 }
-
